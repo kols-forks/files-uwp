@@ -716,61 +716,65 @@ namespace Files.Interacts
 
             if (typeof(PageType) == typeof(GenericFileBrowser))
             {
-                var CurrentInstance = ItemViewModel<GenericFileBrowser>.GetCurrentSelectedTabInstance<ProHome>();
+                var CurrentInstance = ItemViewModel<PhotoAlbum>.GetCurrentSelectedTabInstance<ProHome>();
+                (CurrentInstance.accessibleContentFrame.Content as GenericFileBrowser).AllView.CurrentColumn = (CurrentInstance.accessibleContentFrame.Content as GenericFileBrowser).AllView.Columns[1];
+                (CurrentInstance.accessibleContentFrame.Content as GenericFileBrowser).AllView.BeginEdit();
 
-                CurrentInstance.inputFromRename.Text = "";
-                try
-                {
-                    var ItemSelected = (CurrentInstance.accessibleContentFrame.Content as GenericFileBrowser).data.SelectedIndex;
-                    var RowData = (type as GenericFileBrowser).instanceViewModel.FilesAndFolders[ItemSelected];
-                    await CurrentInstance.NameBox.ShowAsync();
-                    var input = CurrentInstance.inputForRename;
-                    if (input != null)
-                    {
-                        if (RowData.FileType == "Folder")
-                        {
-                            var item = await StorageFolder.GetFolderFromPathAsync(RowData.FilePath);
-                            await item.RenameAsync(input, NameCollisionOption.FailIfExists);
-                            (type as GenericFileBrowser).instanceViewModel.RemoveFileOrFolder(RowData);
-                            (type as GenericFileBrowser).instanceViewModel.AddFileOrFolder(new ListedItem(item.FolderRelativeId)
-                            {
-                                FileName = input,
-                                FileDateReal = DateTimeOffset.Now,
-                                EmptyImgVis = Visibility.Collapsed,
-                                FolderImg = Visibility.Visible,
-                                FileIconVis = Visibility.Collapsed,
-                                FileType = "Folder",
-                                FileImg = null,
-                                FilePath = Path.Combine((type as GenericFileBrowser).instanceViewModel.Universal.path, input)
-                            });
-                        }
-                        else
-                        {
-                            var item = await StorageFile.GetFileFromPathAsync(RowData.FilePath);
-                            await item.RenameAsync(input + RowData.DotFileExtension, NameCollisionOption.FailIfExists);
-                            (type as GenericFileBrowser).instanceViewModel.RemoveFileOrFolder(RowData);
-                            (type as GenericFileBrowser).instanceViewModel.AddFileOrFolder(new ListedItem(item.FolderRelativeId)
-                            {
-                                FileName = input,
-                                FileDateReal = DateTimeOffset.Now,
-                                EmptyImgVis = Visibility.Visible,
-                                FolderImg = Visibility.Collapsed,
-                                FileIconVis = Visibility.Collapsed,
-                                FileType = RowData.FileType,
-                                FileImg = null,
-                                FilePath = Path.Combine((type as GenericFileBrowser).instanceViewModel.Universal.path, input + RowData.DotFileExtension),
-                                DotFileExtension = RowData.DotFileExtension
-                            });
-                        }
-                    }
+                //var CurrentInstance = ItemViewModel<GenericFileBrowser>.GetCurrentSelectedTabInstance<ProHome>();
 
-                }
-                catch (Exception)
-                {
-                    MessageDialog itemAlreadyExistsDialog = new MessageDialog("An item with this name already exists in this folder", "Try again");
-                    await itemAlreadyExistsDialog.ShowAsync();
-                }
-                CurrentInstance.FS.isEnabled = false;
+                //CurrentInstance.inputFromRename.Text = "";
+                //try
+                //{
+                //    var ItemSelected = (CurrentInstance.accessibleContentFrame.Content as GenericFileBrowser).data.SelectedIndex;
+                //    var RowData = (type as GenericFileBrowser).instanceViewModel.FilesAndFolders[ItemSelected];
+                //    await CurrentInstance.NameBox.ShowAsync();
+                //    var input = CurrentInstance.inputForRename;
+                //    if (input != null)
+                //    {
+                //        if (RowData.FileType == "Folder")
+                //        {
+                //            var item = await StorageFolder.GetFolderFromPathAsync(RowData.FilePath);
+                //            await item.RenameAsync(input, NameCollisionOption.FailIfExists);
+                //            (type as GenericFileBrowser).instanceViewModel.RemoveFileOrFolder(RowData);
+                //            (type as GenericFileBrowser).instanceViewModel.AddFileOrFolder(new ListedItem(item.FolderRelativeId)
+                //            {
+                //                FileName = input,
+                //                FileDateReal = DateTimeOffset.Now,
+                //                EmptyImgVis = Visibility.Collapsed,
+                //                FolderImg = Visibility.Visible,
+                //                FileIconVis = Visibility.Collapsed,
+                //                FileType = "Folder",
+                //                FileImg = null,
+                //                FilePath = Path.Combine((type as GenericFileBrowser).instanceViewModel.Universal.path, input)
+                //            });
+                //        }
+                //        else
+                //        {
+                //            var item = await StorageFile.GetFileFromPathAsync(RowData.FilePath);
+                //            await item.RenameAsync(input + RowData.DotFileExtension, NameCollisionOption.FailIfExists);
+                //            (type as GenericFileBrowser).instanceViewModel.RemoveFileOrFolder(RowData);
+                //            (type as GenericFileBrowser).instanceViewModel.AddFileOrFolder(new ListedItem(item.FolderRelativeId)
+                //            {
+                //                FileName = input,
+                //                FileDateReal = DateTimeOffset.Now,
+                //                EmptyImgVis = Visibility.Visible,
+                //                FolderImg = Visibility.Collapsed,
+                //                FileIconVis = Visibility.Collapsed,
+                //                FileType = RowData.FileType,
+                //                FileImg = null,
+                //                FilePath = Path.Combine((type as GenericFileBrowser).instanceViewModel.Universal.path, input + RowData.DotFileExtension),
+                //                DotFileExtension = RowData.DotFileExtension
+                //            });
+                //        }
+                //    }
+
+                //}
+                //catch (Exception)
+                //{
+                //    MessageDialog itemAlreadyExistsDialog = new MessageDialog("An item with this name already exists in this folder", "Try again");
+                //    await itemAlreadyExistsDialog.ShowAsync();
+                //}
+                //CurrentInstance.FS.isEnabled = false;
             }
             else if (typeof(PageType) == typeof(PhotoAlbum))
             {

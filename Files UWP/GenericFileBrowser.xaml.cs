@@ -11,6 +11,7 @@ using Files.Navigation;
 using Files.Interacts;
 using System.Diagnostics;
 using Windows.UI.Core;
+using Windows.UI.Popups;
 
 namespace Files
 {
@@ -203,11 +204,18 @@ namespace Files
             var selectedItem = instanceViewModel.FilesAndFolders[e.Row.GetIndex()];
             if(selectedItem.FileType == "Folder")
             {
-                StorageFolder FolderToRename = await StorageFolder.GetFolderFromPathAsync(selectedItem.FilePath);
-                if(FolderToRename.Name != newCellText)
+                StorageFolder folderToRename = await StorageFolder.GetFolderFromPathAsync(selectedItem.FilePath);
+                if(folderToRename.DisplayName != newCellText)
                 {
-                    await FolderToRename.RenameAsync(newCellText);
-                    AllView.CommitEdit();
+                    try
+                    {
+                        await folderToRename.RenameAsync(newCellText);
+                    }
+                    catch (Exception)
+                    {
+                        MessageDialog itemAlreadyExistsDialog = new MessageDialog("An item with this name already exists in this folder", "Try again");
+                        await itemAlreadyExistsDialog.ShowAsync();
+                    }
                 }
                 else
                 {
@@ -217,26 +225,43 @@ namespace Files
             else
             {
                 StorageFile fileToRename = await StorageFile.GetFileFromPathAsync(selectedItem.FilePath);
-                if (fileToRename.Name != newCellText)
+                if (fileToRename.DisplayName != newCellText)
                 {
-                    await fileToRename.RenameAsync(newCellText);
-                    AllView.CommitEdit();
+                    if (newCellText.StartsWith("."))
+                    {
+                        MessageDialog unsupportedRenameDialog = new MessageDialog("Items starting with \".\" are not supported. you'll need to remove the illegal character and try again.", "Unsupported Item Name");
+                        await unsupportedRenameDialog.ShowAsync();
+                        return;
+                    }
+                    else if (!newCellText.Contains("."))
+                    {
+                        MessageDialog unsupportedRenameDialog = new MessageDialog("The name you're attempting to rename this file to is missing a file extension. You'll need to determine this and try again.", "Specify a File Extension");
+                        await unsupportedRenameDialog.ShowAsync();
+                        return;
+                    }
+                    else
+                    {
+                        try
+                        {
+                            await fileToRename.RenameAsync(newCellText);
+                        }
+                        catch (Exception)
+                        {
+                            MessageDialog itemAlreadyExistsDialog = new MessageDialog("An item with this name already exists in this folder", "Try again");
+                            await itemAlreadyExistsDialog.ShowAsync();
+                        }
+                    }
                 }
                 else
                 {
                     AllView.CancelEdit();
                 }
             }
-            //Navigation.NavigationActions.Refresh_Click(null, null);
-        }
-
-        private void ContentDialog_Loaded(object sender, RoutedEventArgs e)
-        {
-            //AddDialogFrame.Navigate(typeof(AddItem), new SuppressNavigationTransitionInfo());
         }
 
         private void GenericItemView_PointerReleased(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
+            AllView.CommitEdit();
             data.SelectedItem = null;
             ItemViewModel<GenericFileBrowser>.GetCurrentSelectedTabInstance<ProHome>().HomeItems.isEnabled = false;
             ItemViewModel<GenericFileBrowser>.GetCurrentSelectedTabInstance<ProHome>().ShareItems.isEnabled = false;

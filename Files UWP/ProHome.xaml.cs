@@ -827,7 +827,8 @@ namespace Files
         {
             if (this.accessibleContentFrame.SourcePageType == typeof(GenericFileBrowser))
             {
-                (this.accessibleContentFrame.Content as GenericFileBrowser).instanceInteraction.RenameItem_Click(null, null);
+                (accessibleContentFrame.Content as GenericFileBrowser).AllView.BeginEdit();
+                //(this.accessibleContentFrame.Content as GenericFileBrowser).instanceInteraction.RenameItem_Click(null, null);
             }
             else if (this.accessibleContentFrame.SourcePageType == typeof(PhotoAlbum))
             {
@@ -910,18 +911,13 @@ namespace Files
         {
             if (this.accessibleContentFrame.SourcePageType == typeof(GenericFileBrowser))
             {
-                propertiesFrame.Navigate(typeof(Properties), (ItemViewModel<ProHome>.GetCurrentSelectedTabInstance<ProHome>().accessibleContentFrame.Content as GenericFileBrowser).data.SelectedItems, new SuppressNavigationTransitionInfo());
+                propertiesFrame.Navigate(typeof(Properties), (accessibleContentFrame.Content as GenericFileBrowser).data.SelectedItems, new SuppressNavigationTransitionInfo());
             }
             else if (this.accessibleContentFrame.SourcePageType == typeof(PhotoAlbum))
             {
-                propertiesFrame.Navigate(typeof(Properties), (ItemViewModel<ProHome>.GetCurrentSelectedTabInstance<ProHome>().accessibleContentFrame.Content as PhotoAlbum).gv.SelectedItems, new SuppressNavigationTransitionInfo());
+                propertiesFrame.Navigate(typeof(Properties), (accessibleContentFrame.Content as PhotoAlbum).gv.SelectedItems, new SuppressNavigationTransitionInfo());
             }
             await PropertiesDialog.ShowAsync(ContentDialogPlacement.Popup);
-        }
-
-        public void PropertiesWindow_CancelButton_Click(object sender, RoutedEventArgs e)
-        {
-            //propertiesWindow.RequestSize(new Windows.Foundation.Size(200, 450));
         }
 
         private void RibbonTip_Loaded(object sender, RoutedEventArgs e)
